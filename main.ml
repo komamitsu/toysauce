@@ -169,42 +169,6 @@ and innar_func env (params : expr) name : value =
   | _ -> 
       failwith (sprintf "innar_func: %s was not found" name)
 
-let sample = ExprList [
-  SetVar ("hello",
-    Value (
-      Func (
-        ["first_name"; "last_name"],
-        ExprList [
-          SetVar ("full_name", 
-            CallInnarFunc ("concat", ExprList [
-              Value (String "I am ");
-              GetVar "first_name";
-              Value (String " ");
-              GetVar "last_name";
-              Value (String ".\n")
-            ]));
-          CallInnarFunc ("print", ExprList [GetVar "full_name"])
-        ]
-    )));
-  CallFunc ("hello", 
-    ExprList [
-      Value (String "Larry");
-      Value (String "Wall")
-    ]
-  );
-  CallInnarFunc ("if",
-    ExprList [
-      CallInnarFunc (">=", ExprList [Value (Int 1234); Value (Int 1235)]);
-      ExprList [
-        CallInnarFunc ("print", ExprList [Value (String "foo")])
-      ];
-      ExprList [
-        SetVar ("tmp", Value (String "bar"));
-        CallInnarFunc ("print", ExprList [GetVar "tmp"])
-      ]
-    ]);
-]
-
 let _ =
   Printexc.record_backtrace true;
   try 
@@ -213,10 +177,9 @@ let _ =
       let result = Parser.main Lexer.token lexbuf in
       result::parsed in
     let expr_list = loop [] in
+    print_endline (string_of_expr (ExprList expr_list)); flush stdout;
     ignore (eval_expr (empty_env ()) (ExprList expr_list))
   with e -> 
     Printf.eprintf "Unexpected exception : %s\n" (Printexc.to_string e);
     Printexc.print_backtrace stderr
-
-(*  eval_expr (empty_env ()) sample *)
 
