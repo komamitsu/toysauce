@@ -37,10 +37,13 @@ exprs:
   | exprs TERM               { $1 }
 
 expr:
-  | value                    { 
-    Value $1 }
+  | value                    { Value $1 }
   | symbol EQUAL expr        { SetVar ($1, $3) }
   | symbol LPAREN func_params RPAREN { CallFunc ($1, ExprList $3) }
+  | expr  PLUS  expr         { CallFunc ("+", ExprList[$1; $3]) }
+  | expr  MINUS expr         { CallFunc ("-", ExprList[$1; $3]) }
+  | expr  TIMES expr         { CallFunc ("*", ExprList[$1; $3]) }
+  | expr  DIV   expr         { CallFunc ("/", ExprList[$1; $3]) }
 
 value:
   | INT                      { Int ($1) }

@@ -1,46 +1,6 @@
-open Syntax
 open Printf
-
-module Env : sig
-  type t
-  val empty_env : unit -> t
-  val append_to_current_env : t -> symbol -> value -> t
-  val find_from_env : t -> symbol -> value
-  val create_next_env : t -> t
-  val drop_current_env : t -> t
-end
-  = 
-struct
-  type t = (symbol, value) Hashtbl.t list
-
-  let empty_env_unit () = Hashtbl.create 10
-
-  let empty_env () = [empty_env_unit ()]
-
-  let append_to_current_env env k v = 
-    match env with
-    | [] -> failwith "append_to_current_env: No current_env"
-    | hd :: tl -> 
-        Hashtbl.replace hd k v;
-        hd :: tl
-
-  let rec find_from_env env k = 
-    match env with
-    | [] -> raise Not_found
-    | hd :: tl -> 
-        try Hashtbl.find hd k with 
-        | Not_found -> find_from_env tl k
-
-  let create_next_env env =
-    (empty_env_unit ()) :: env
-
-  let drop_current_env env =
-    match env with
-    | [] -> failwith "drop_current_env: No current_env"
-    | hd :: tl -> tl
-end
-
 open Env
+open Syntax
 
 let rec eval_expr env = function
   | Value v -> (env, v)
@@ -164,6 +124,16 @@ and innar_func env (params : expr) name : value =
                   v
               | _ -> failwith (sprintf "%s: Invalid type" name)
             )
+        | _ -> failwith (sprintf "%s: Invalid type" name)
+      )
+  | "+" | "-" | "*" | "/" ->
+      let env, vs = get_values () in (
+        let f = 
+          match name with 
+          | "+" -> (+) | "-" -> (-) | "*" -> ( * ) | "/" -> (/) 
+          | _ -> failwith (sprintf "%s: Unknown Error" name) in
+        match (List.nth vs 0), (List.nth vs 1) with
+        | Int a, Int b -> Int (f a b)
         | _ -> failwith (sprintf "%s: Invalid type" name)
       )
   | _ -> 

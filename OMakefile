@@ -150,6 +150,7 @@ FILES[] =
    syntax
    lexer
    parser
+   env
    main
 #
 PROGRAM = toysauce
