@@ -12,6 +12,7 @@ rule token = parse
       String.sub s 1 ((String.length s) -2) in
     STRING striped 
   }
+  | "func"                   { FUNC }
   | ['0'-'9' 'a'-'z']+       { SYMBOL (Lexing.lexeme lexbuf) }
 	| '+'                      { PLUS }
 	| '-'                      { MINUS }

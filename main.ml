@@ -36,7 +36,7 @@ let rec eval_expr env = function
       List.fold_left
       (fun (env, _) expr -> eval_expr env expr)
       (env, Null) expr_list
-and innar_func env (params : expr) name : value =
+and innar_func env params name =
   let get_values () =
     match params with
     | ExprList ps ->
@@ -46,8 +46,9 @@ and innar_func env (params : expr) name : value =
             let new_env, v = eval_expr env expr in
             (new_env, v::vs)) (env, []) ps in
         (env, List.rev vs)
-    | _ -> failwith "CallFunc: Not ExprList was given"
-  in
+    | _ -> failwith "CallFunc: Not ExprList was given" in
+  let exc () = failwith (sprintf "%s: Invalid type. Params are %s" name 
+                          (string_of_expr params)) in
   match name with
   | "print" -> 
       let env, vs = get_values () in
@@ -67,7 +68,7 @@ and innar_func env (params : expr) name : value =
           (fun acc v ->
             match v with
             | String s -> acc ^ s
-            | _ -> failwith (sprintf "%s: Invalid type" name)
+            | _ -> exc ()
           ) "" vs
       )
   | ">" -> 
@@ -75,42 +76,42 @@ and innar_func env (params : expr) name : value =
         match (List.nth vs 0), (List.nth vs 1) with
         | Int a, Int b -> Bool (a > b)
         | String a, String b -> Bool (String.compare a b > 0)
-        | _ -> failwith (sprintf "%s: Invalid type" name)
+        | _ -> exc ()
       )
   | ">=" -> 
       let env, vs = get_values () in (
         match (List.nth vs 0), (List.nth vs 1) with
         | Int a, Int b -> Bool (a >= b)
         | String a, String b -> Bool (String.compare a b >= 0)
-        | _ -> failwith (sprintf "%s: Invalid type" name)
+        | _ -> exc ()
       )
   | "<" ->
       let env, vs = get_values () in (
         match (List.nth vs 0), (List.nth vs 1) with
         | Int a, Int b -> Bool (a < b)
         | String a, String b -> Bool (String.compare a b < 0)
-        | _ -> failwith (sprintf "%s: Invalid type" name)
+        | _ -> exc ()
       )
   | "<=" ->
       let env, vs = get_values () in (
         match (List.nth vs 0), (List.nth vs 1) with
         | Int a, Int b -> Bool (a <= b)
         | String a, String b -> Bool (String.compare a b <= 0)
-        | _ -> failwith (sprintf "%s: Invalid type" name)
+        | _ -> exc ()
       )
   | "==" ->
       let env, vs = get_values () in (
         match (List.nth vs 0), (List.nth vs 1) with
         | Int a, Int b -> Bool (a = b)
         | String a, String b -> Bool (String.compare a b = 0)
-        | _ -> failwith (sprintf "%s: Invalid type" name)
+        | _ -> exc ()
       )
   | "!=" ->
       let env, vs = get_values () in (
         match (List.nth vs 0), (List.nth vs 1) with
         | Int a, Int b -> Bool (a != b)
         | String a, String b -> Bool (String.compare a b != 0)
-        | _ -> failwith (sprintf "%s: Invalid type" name)
+        | _ -> exc ()
       )
   | "if" -> (
         match params with
@@ -122,9 +123,9 @@ and innar_func env (params : expr) name : value =
                     eval_expr env 
                       (if b then expr_true else expr_false) in
                   v
-              | _ -> failwith (sprintf "%s: Invalid type" name)
+              | _ -> exc ()
             )
-        | _ -> failwith (sprintf "%s: Invalid type" name)
+        | _ -> exc ()
       )
   | "+" | "-" | "*" | "/" ->
       let env, vs = get_values () in (
@@ -134,7 +135,7 @@ and innar_func env (params : expr) name : value =
           | _ -> failwith (sprintf "%s: Unknown Error" name) in
         match (List.nth vs 0), (List.nth vs 1) with
         | Int a, Int b -> Int (f a b)
-        | _ -> failwith (sprintf "%s: Invalid type" name)
+        | _ -> exc ()
       )
   | _ -> 
       failwith (sprintf "innar_func: %s was not found" name)
