@@ -18,6 +18,7 @@
 %token EOF
 %token PLUS MINUS
 %token TIMES DIV
+%left EQUAL
 %left PLUS MINUS
 %left TIMES DIV
 %nonassoc UMINUS
@@ -47,13 +48,17 @@ expr:
   | symbol EQUAL expr        { SetVar ($1, $3) }
   | symbol LPAREN func_params RPAREN { CallFunc ($1, ExprList $3) }
   | expr  PLUS  expr         { 
-    CallFunc ("+", ExprList[eval_value_symbol $1; eval_value_symbol $3]) }
+    CallFunc ("+", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+  }
   | expr  MINUS expr         { 
-    CallFunc ("-", ExprList[eval_value_symbol $1; eval_value_symbol $3]) }
+    CallFunc ("-", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+  }
   | expr  TIMES expr         { 
-    CallFunc ("*", ExprList[eval_value_symbol $1; eval_value_symbol $3]) }
+    CallFunc ("*", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+  }
   | expr  DIV   expr         { 
-    CallFunc ("/", ExprList[eval_value_symbol $1; eval_value_symbol $3]) }
+    CallFunc ("/", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+  }
 
 value:
   | FUNC LPAREN func_args RPAREN LBRACE expr_list RBRACE { 

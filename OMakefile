@@ -24,7 +24,7 @@
 # Phony targets are scoped, so you probably want to declare them first.
 #
 
-# .PHONY: all install clean
+.PHONY: all install clean
 
 ########################################################################
 # Subdirectories.
@@ -116,6 +116,7 @@ USE_OCAMLFIND = true
 # Various options
 #
 OCAMLFLAGS    += -g
+OCAMLYACCFLAGS += -v
 # OCAMLCFLAGS   +=
 # OCAMLOPTFLAGS +=
 # OCAML_LINK_FLAGS +=
