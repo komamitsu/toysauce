@@ -24,7 +24,13 @@ rule token = parse
 	| '}'                      { RBRACE }
   | ';'                      { TERM }
   | ','                      { COMMA }
-  | '='                      { EQUAL }
+  | "=="                     { EQUAL }
+  | "!="                     { NOTEQUAL }
+  | ">"                      { GT }
+  | ">="                     { GE }
+  | "<"                      { LT }
+  | "<="                     { LE }
+  | '='                      { ASSIGN }
 	| eof                      { EOF }
   | _ as other               { 
     printf "Unrecognized character: %c\n" other; token lexbuf 
