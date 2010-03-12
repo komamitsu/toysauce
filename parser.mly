@@ -2,7 +2,7 @@
   open Printf
   open Syntax
   
-  let eval_value_symbol expr =
+  let eval_param expr =
     match expr with
     | Value (Symbol s) -> GetVar s
     | _ -> expr
@@ -52,37 +52,37 @@ expr:
   | symbol LPAREN func_params RPAREN { CallFunc ($1, ExprList $3) }
   | LPAREN expr RPAREN       { $2 }
   | expr  PLUS  expr         { 
-    CallFunc ("+", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+    CallFunc ("+", ExprList[eval_param $1; eval_param $3])
   }
   | expr  MINUS expr         { 
-    CallFunc ("-", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+    CallFunc ("-", ExprList[eval_param $1; eval_param $3])
   }
   | expr  TIMES expr         { 
-    CallFunc ("*", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+    CallFunc ("*", ExprList[eval_param $1; eval_param $3])
   }
   | expr  DIV   expr         { 
-    CallFunc ("/", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+    CallFunc ("/", ExprList[eval_param $1; eval_param $3])
   }
   | expr EQUAL    expr       { 
-    CallFunc ("==", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+    CallFunc ("==", ExprList[eval_param $1; eval_param $3])
   }
   | expr NOTEQUAL expr       { 
-    CallFunc ("!=", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+    CallFunc ("!=", ExprList[eval_param $1; eval_param $3])
   }
   | expr GT       expr       { 
-    CallFunc (">", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+    CallFunc (">", ExprList[eval_param $1; eval_param $3])
   }
   | expr GE       expr       { 
-    CallFunc (">=", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+    CallFunc (">=", ExprList[eval_param $1; eval_param $3])
   }
   | expr LT       expr       { 
-    CallFunc ("<", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+    CallFunc ("<", ExprList[eval_param $1; eval_param $3])
   }
   | expr LE       expr       { 
-    CallFunc ("<=", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+    CallFunc ("<=", ExprList[eval_param $1; eval_param $3])
   }
   | IF LPAREN expr RPAREN LBRACE exprs RBRACE ELSE LBRACE exprs RBRACE {
-    CallFunc ("if", ExprList[eval_value_symbol $3; ExprList $6; ExprList $10])
+    CallFunc ("if", ExprList[eval_param $3; ExprList $6; ExprList $10])
   }
 
 value:
@@ -103,6 +103,6 @@ func_args:
   | func_args COMMA symbol   { $1 @ [$3] }
 
 func_params:
-  | expr                     { [eval_value_symbol $1] }
-  | func_params COMMA expr   { $1 @ [eval_value_symbol $3] }
+  | expr                     { [eval_param $1] }
+  | func_params COMMA expr   { $1 @ [eval_param $3] }
 
