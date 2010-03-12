@@ -16,9 +16,10 @@
 %token ASSIGN
 %token TERM COMMA
 %token EQUAL NOTEQUAL GT GE LT LE 
-%token EOF
+%token IF ELSE
 %token PLUS MINUS
 %token TIMES DIV
+%token EOF
 %left ASSIGN
 %left EQUAL NOTEQUAL GT GE LT LE 
 %left PLUS MINUS
@@ -49,6 +50,7 @@ expr:
   | value                    { Value $1 }
   | symbol ASSIGN expr       { SetVar ($1, $3) }
   | symbol LPAREN func_params RPAREN { CallFunc ($1, ExprList $3) }
+  | LPAREN expr RPAREN       { $2 }
   | expr  PLUS  expr         { 
     CallFunc ("+", ExprList[eval_value_symbol $1; eval_value_symbol $3])
   }
@@ -78,6 +80,9 @@ expr:
   }
   | expr LE       expr       { 
     CallFunc ("<=", ExprList[eval_value_symbol $1; eval_value_symbol $3])
+  }
+  | IF LPAREN expr RPAREN LBRACE exprs RBRACE ELSE LBRACE exprs RBRACE {
+    CallFunc ("if", ExprList[eval_value_symbol $3; ExprList $6; ExprList $10])
   }
 
 value:

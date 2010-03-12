@@ -13,6 +13,8 @@ rule token = parse
     STRING striped 
   }
   | "func"                   { FUNC }
+  | "if"                     { IF }
+  | "else"                   { ELSE }
   | ['0'-'9' 'a'-'z']+       { SYMBOL (Lexing.lexeme lexbuf) }
 	| '+'                      { PLUS }
 	| '-'                      { MINUS }
