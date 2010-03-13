@@ -1,6 +1,5 @@
 open Printf
 open Syntax
-open Eval
 
 let debug = ref false
 let source = ref stdin
@@ -20,7 +19,7 @@ let _ =
     let expr_list = loop [] in
     if !debug 
     then print_endline (string_of_expr (ExprList expr_list)); flush stdout;
-    ignore (eval_expr (Env.empty ()) (ExprList expr_list))
+    ignore (Eval.eval_expr (Env.empty ()) (ExprList expr_list))
   with e -> 
     Printf.eprintf "Unexpected exception : %s\n" (Printexc.to_string e);
     Printexc.print_backtrace stderr

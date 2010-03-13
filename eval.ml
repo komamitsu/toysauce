@@ -60,7 +60,7 @@ and innar_func env params name =
       (string_of_expr params) (Env.string_of_env env);
     failwith (sprintf "%s: Invalid type." name) in
   match name with
-  | "print" -> 
+  | "print" | "puts" -> 
       let env, vs = get_values () in
       let v = List.nth vs 0 in (
         match v with
@@ -70,7 +70,8 @@ and innar_func env params name =
         | Bool b -> print_string (if b then "(true)" else "(false)")
         | Func _ -> print_string "(function)"
         | Null -> print_string "(null)"
-      ); v
+      );
+      if name = "puts" then print_newline ();  v
   | "concat" -> 
       let env, vs = get_values () in
       String (

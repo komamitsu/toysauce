@@ -38,14 +38,7 @@ expr_list:
 exprs:
   | TERM                     { [] }
   | expr TERM                { [$1] }
-  | def_func                 { [$1] }
   | exprs expr TERM          { $1 @ [$2] }
-  | exprs def_func           { $1 @ [$2] }
-
-def_func:
-  | FUNC symbol LPAREN func_args RPAREN LBRACE expr_list RBRACE { 
-    SetVar ($2, Value (Func ($4, $7)))
-  }
 
 expr:
   | value                    { Value $1 }
@@ -85,6 +78,7 @@ expr:
   | IF LPAREN expr RPAREN LBRACE exprs RBRACE ELSE LBRACE exprs RBRACE {
     CallFunc ("if", ExprList[eval_param $3; ExprList $6; ExprList $10])
   }
+  | def_func                 { $1 }
 
 value:
   | FUNC LPAREN func_args RPAREN LBRACE expr_list RBRACE { 
@@ -98,6 +92,10 @@ value:
 symbol:
   | SYMBOL                   { $1 }
 
+def_func:
+  | FUNC symbol LPAREN func_args RPAREN LBRACE expr_list RBRACE { 
+    SetVar ($2, Value (Func ($4, $7)))
+  }
 
 func_args:
   | symbol                   { [$1] } 

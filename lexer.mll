@@ -6,7 +6,7 @@
 rule token = parse
   | [' ' '\t' '\n']+         { token lexbuf }
 	| ['0'-'9']+               { INT (int_of_string (Lexing.lexeme lexbuf)) }
-  | '"' [^ '\n']* '"'        { 
+  | '"' [^ '"' '\n']* '"'        { 
     let s = Lexing.lexeme lexbuf in
     let striped = 
       String.sub s 1 ((String.length s) -2) in
