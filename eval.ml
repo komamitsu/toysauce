@@ -62,16 +62,16 @@ and innar_func env params name =
   match name with
   | "print" | "puts" -> 
       let env, vs = get_values () in
-      let v = List.nth vs 0 in (
-        match v with
-        | Symbol s -> printf "(symbol : %s)" s
-        | Int i -> print_int i
-        | String s -> print_string s
-        | Bool b -> print_string (if b then "(true)" else "(false)")
-        | Func _ -> print_string "(function)"
-        | Null -> print_string "(null)"
-      );
-      if name = "puts" then print_newline ();  v
+      List.fold_left
+        (fun acc v -> (
+            match v with
+            | Int i -> print_int i
+            | String s -> print_string s
+            | _ -> print_string (string_of_value v)
+          );
+          if name = "puts" then print_newline ();
+          v
+        ) Null vs
   | "concat" -> 
       let env, vs = get_values () in
       String (
@@ -81,6 +81,18 @@ and innar_func env params name =
             | String s -> acc ^ s
             | _ -> exc ()
           ) "" vs
+      )
+  | "length" ->
+      let env, vs = get_values () in (
+        match List.nth vs 0 with
+        | Collection vs -> Int (List.length vs)
+        | _ -> exc ()
+      )
+  | "nth" ->
+      let env, vs = get_values () in (
+        match List.nth vs 0, List.nth vs 1 with
+        | Collection vs, Int i -> List.nth vs i
+        | _ -> exc ()
       )
   | ">" -> 
       let env, vs = get_values () in (

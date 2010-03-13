@@ -24,6 +24,8 @@ rule token = parse
 	| ')'                      { RPAREN }
 	| '{'                      { LBRACE }
 	| '}'                      { RBRACE }
+	| '['                      { LBRACKET }
+	| ']'                      { RBRACKET }
   | ';'                      { TERM }
   | ','                      { COMMA }
   | "=="                     { EQUAL }

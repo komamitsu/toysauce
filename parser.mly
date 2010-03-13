@@ -14,6 +14,7 @@
 %token FUNC
 %token LPAREN RPAREN
 %token LBRACE RBRACE
+%token LBRACKET RBRACKET
 %token ASSIGN
 %token TERM COMMA
 %token EQUAL NOTEQUAL GT GE LT LE 
@@ -43,7 +44,7 @@ exprs:
 expr:
   | value                    { Value $1 }
   | symbol ASSIGN expr       { SetVar ($1, $3) }
-  | symbol LPAREN func_params RPAREN { CallFunc ($1, ExprList $3) }
+  | symbol LPAREN src_of_expr_list RPAREN { CallFunc ($1, ExprList $3) }
   | LPAREN expr RPAREN       { $2 }
   | expr  PLUS  expr         { 
     CallFunc ("+", ExprList[eval_param $1; eval_param $3])
@@ -75,8 +76,8 @@ expr:
   | expr LE       expr       { 
     CallFunc ("<=", ExprList[eval_param $1; eval_param $3])
   }
-  | IF LPAREN expr RPAREN LBRACE exprs RBRACE ELSE LBRACE exprs RBRACE {
-    CallFunc ("if", ExprList[eval_param $3; ExprList $6; ExprList $10])
+  | IF LPAREN expr RPAREN LBRACE expr_list RBRACE ELSE LBRACE expr_list RBRACE {
+    CallFunc ("if", ExprList[eval_param $3; $6; $10])
   }
   | def_func                 { $1 }
 
@@ -88,9 +89,19 @@ value:
   | MINUS INT %prec UMINUS   { Int (-$2) }
   | STRING                   { String $1 }
   | symbol                   { Symbol $1 }
+  | LBRACKET value_list RBRACKET { Collection $2 }
+
+value_list:
+  |                          { [] }
+  | value                    { [$1] }
+  | value_list COMMA value   { $1 @ [$3] }
 
 symbol:
   | SYMBOL                   { $1 }
+
+src_of_expr_list:
+  | expr                          { [eval_param $1] }
+  | src_of_expr_list COMMA expr   { $1 @ [eval_param $3] }
 
 def_func:
   | FUNC symbol LPAREN func_args RPAREN LBRACE expr_list RBRACE { 
@@ -100,8 +111,4 @@ def_func:
 func_args:
   | symbol                   { [$1] } 
   | func_args COMMA symbol   { $1 @ [$3] }
-
-func_params:
-  | expr                     { [eval_param $1] }
-  | func_params COMMA expr   { $1 @ [eval_param $3] }
 
