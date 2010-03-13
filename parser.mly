@@ -1,6 +1,7 @@
 %{
   open Printf
   open Syntax
+  open Eval
   
   let eval_param expr =
     match expr with

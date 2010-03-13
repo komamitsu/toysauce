@@ -152,6 +152,7 @@ FILES[] =
    lexer
    parser
    env
+   eval
    main
 #
 PROGRAM = toysauce
