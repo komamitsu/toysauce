@@ -18,23 +18,32 @@ let rec eval_expr env = function
               let env_with_args = 
                 List.fold_left2 
                 (fun env arg param -> 
-                  let new_env, v = eval_expr env param in
-                  Env.append_to_current new_env arg v) 
+                  let new_env, v = 
+                    eval_expr env param in
+                  Env.append_to_current new_env arg v)
                 (Env.create_new env) args ps in
-              eval_expr env_with_args expr_list
+              let env, v = eval_expr env_with_args expr_list in
+              let env, v = after_call_func env v in
+              (Env.drop_current env, v)
           | _ -> failwith "CallFunc: Not ExprList was given"
         )
         | _ -> raise Not_found
       ) 
       with Not_found ->
-        let v = innar_func env params f in (env, v)
+        let v = innar_func env params f in 
+        after_call_func env v
     )
   | CallInnarFunc (f, params) -> 
-      let v = innar_func env params f in (env, v)
+      let v = innar_func env params f in 
+      after_call_func env v
   | ExprList expr_list ->
       List.fold_left
       (fun (env, _) expr -> eval_expr env expr)
       (env, Null) expr_list
+and after_call_func env v =
+  match v with
+  | Symbol s -> eval_expr env (GetVar s)
+  | _ -> (env, v)
 and innar_func env params name =
   let get_values () =
     match params with
