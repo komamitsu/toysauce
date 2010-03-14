@@ -16,7 +16,7 @@ rule token = parse
   | "func"                   { FUNC }
   | "if"                     { IF }
   | "else"                   { ELSE }
-  | ['0'-'9' '_' 'a'-'z']+   { SYMBOL (Lexing.lexeme lexbuf) }
+  | ['0'-'9' '_' 'a'-'z']+   { VAR (Lexing.lexeme lexbuf) }
 	| '+'                      { PLUS }
 	| '-'                      { MINUS }
 	| '*'                      { TIMES }

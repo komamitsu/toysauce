@@ -33,16 +33,13 @@ let rec eval_expr env = function
         let v = innar_func env params f in 
         after_call_func env v
     )
-  | CallInnarFunc (f, params) -> 
-      let v = innar_func env params f in 
-      after_call_func env v
   | ExprList expr_list ->
       List.fold_left
       (fun (env, _) expr -> eval_expr env expr)
       (env, Null) expr_list
 and after_call_func env v =
   match v with
-  | Symbol s -> eval_expr env (GetVar s)
+  | Var v -> eval_expr env (GetVar v)
   | _ -> (env, v)
 and innar_func env params name =
   let get_values () =

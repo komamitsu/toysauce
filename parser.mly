@@ -5,12 +5,12 @@
   
   let eval_param expr =
     match expr with
-    | Value (Symbol s) -> GetVar s
+    | Value (Var s) -> GetVar s
     | _ -> expr
 %}
 %token <int> INT
 %token <string> STRING
-%token <string> SYMBOL
+%token <string> VAR
 %token FUNC
 %token LPAREN RPAREN
 %token LBRACE RBRACE
@@ -43,8 +43,8 @@ exprs:
 
 expr:
   | value                    { Value $1 }
-  | symbol ASSIGN expr       { SetVar ($1, $3) }
-  | symbol LPAREN src_of_expr_list RPAREN { CallFunc ($1, ExprList $3) }
+  | var ASSIGN expr          { SetVar ($1, $3) }
+  | var LPAREN src_of_expr_list RPAREN { CallFunc ($1, ExprList $3) }
   | LPAREN expr RPAREN       { $2 }
   | expr  PLUS  expr         { 
     CallFunc ("+", ExprList[eval_param $1; eval_param $3])
@@ -88,7 +88,7 @@ value:
   | INT                      { Int ($1) }
   | MINUS INT %prec UMINUS   { Int (-$2) }
   | STRING                   { String $1 }
-  | symbol                   { Symbol $1 }
+  | var                      { Var $1 }
   | LBRACKET value_list RBRACKET { Collection $2 }
 
 value_list:
@@ -96,19 +96,19 @@ value_list:
   | value                    { [$1] }
   | value_list COMMA value   { $1 @ [$3] }
 
-symbol:
-  | SYMBOL                   { $1 }
+var:
+  | VAR                      { $1 }
 
 src_of_expr_list:
   | expr                          { [eval_param $1] }
   | src_of_expr_list COMMA expr   { $1 @ [eval_param $3] }
 
 def_func:
-  | FUNC symbol LPAREN func_args RPAREN LBRACE expr_list RBRACE { 
+  | FUNC var LPAREN func_args RPAREN LBRACE expr_list RBRACE { 
     SetVar ($2, Value (Func ($4, $7)))
   }
 
 func_args:
-  | symbol                   { [$1] } 
-  | func_args COMMA symbol   { $1 @ [$3] }
+  | var                   { [$1] } 
+  | func_args COMMA var   { $1 @ [$3] }
 
