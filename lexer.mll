@@ -1,12 +1,13 @@
 {
   open Printf
   open Parser
-  exception Eof
+  let line = ref 0
 }
 rule token = parse
-  | [' ' '\t' '\n']+         { token lexbuf }
+  | [' ' '\t']+         { token lexbuf }
+  | '\n'                { line := !line + 1; token lexbuf }
 	| ['0'-'9']+               { INT (int_of_string (Lexing.lexeme lexbuf)) }
-  | '"' [^ '"' '\n']* '"'        { 
+  | '"' [^ '"']* '"'        { 
     let s = Lexing.lexeme lexbuf in
     let striped = 
       String.sub s 1 ((String.length s) -2) in
