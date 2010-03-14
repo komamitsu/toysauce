@@ -1,0 +1,77 @@
+= ToySauce
+ToySauce is TOY functinal programming language. It is implemented in OCaml.
+
+== Install
+ $ omake
+
+== Examples
+ $ cat sample.ts
+ func fib(i) {
+   if (i <= 1) { i; }
+   else { fib(i - 2) + fib(i - 1); };
+ };
+
+ func print_fib(i) { puts(fib(i)); };
+ 
+ func each(f, l)
+ {
+   len = length(l);
+   func loop(n, i) {
+     if (n > i) {
+       f(nth(l, i));
+       loop(n, (i + 1));
+     }
+     else { ; };
+   };
+   loop(len, 0);
+ };
+ 
+ puts("fib - start"); puts(fib(6)); puts("fib - end");
+ 
+ puts("each#1 - start");
+ each(print_fib, [0, 1, 2, 3, 4, 5, 6]);
+ puts("each#1 - end");
+ 
+ puts("each#2 - start");
+ each(
+   func (f) { puts(f(1, 2, 3)); },
+   [
+     func (a, b, c) { a + b + c; },
+     func (a, b, c) { a + b * c; },
+     func (a, b, c) { a * b * c; }
+   ]);
+ puts("each#2 - end");
+
+ $ ./toysauce sample.ts
+ fib - start
+ 8
+ fib - end
+ each#1 - start
+ 0
+ 1
+ 1
+ 2
+ 3
+ 5
+ 8
+ each#1 - end
+ each#2 - start
+ 6
+ 7
+ 6
+ each#2 - end
+ 
+ $ ./toysauce
+ print("Hello, ", "World");
+ puts("!");            <= Ctrl-d
+ Hello, World!
+
+== License
+
+ToySauce is released under the MIT license.
+
+
+== Author
+
+Mitsunori Komatsu <komamitsu [at] gmail [dot] com>
+

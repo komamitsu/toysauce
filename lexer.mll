@@ -1,7 +1,7 @@
 {
   open Printf
   open Parser
-  let line = ref 0
+  let line = ref 1
 }
 rule token = parse
   | [' ' '\t']+         { token lexbuf }
